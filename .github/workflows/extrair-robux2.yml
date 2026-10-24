@@ -1,0 +1,42 @@
+name: Extrair robuxkingdom2 ciano
+on:
+  push:
+    paths:
+      - '.github/workflows/extrair-robux2.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  extrair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extrair ZIP para raiz do repositorio
+        run: |
+          python3 - <<'PY'
+          import pathlib, zipfile
+          root = pathlib.Path('.').resolve()
+          with zipfile.ZipFile('robuxkingdom2-ciano.zip') as archive:
+              for entry in archive.infolist():
+                  if entry.is_dir():
+                      continue
+                  parts = pathlib.PurePosixPath(entry.filename).parts
+                  if parts and parts[0] == 'robuxkingdom2-main':
+                      parts = parts[1:]
+                  if not parts or '..' in parts:
+                      raise ValueError('Caminho invalido: ' + entry.filename)
+                  target = root.joinpath(*parts).resolve()
+                  if not target.is_relative_to(root):
+                      raise ValueError('Caminho inseguro: ' + entry.filename)
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  target.write_bytes(archive.read(entry))
+          PY
+      - name: Publicar arquivos extraidos
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "Extrair robuxkingdom2 ciano na raiz"
+            git push
+          fi
