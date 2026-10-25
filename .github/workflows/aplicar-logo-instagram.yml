@@ -1,0 +1,34 @@
+name: Aplicar logo e Instagram Kingdom
+on:
+  push:
+    paths:
+      - 'kingdom-logo-instagram.zip'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  imagens:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Trocar logo do topo e rodape e imagem do Instagram
+        run: |
+          test -f kingdom-logo-instagram.zip
+          unzip -o kingdom-logo-instagram.zip -d .
+          python3 - <<'PY'
+          from pathlib import Path
+          for name in ['index.html', 'www-recargabuxs-com-9ffv-produtos.html']:
+              p=Path(name)
+              if not p.exists(): continue
+              s=p.read_text(encoding='utf-8')
+              s=s.replace('./images/12_ff0ac95f8fe7cf8.png','./images/kingdom-halloween/logo.png')
+              s=s.replace('./images/24_2fbc65f67571f55.webp','./images/kingdom-halloween/instagram.png')
+              p.write_text(s,encoding='utf-8')
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add images/kingdom-halloween index.html www-recargabuxs-com-9ffv-produtos.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Atualizar logo Halloween e imagem Instagram"
+            git push
+          fi
