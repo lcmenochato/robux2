@@ -1,32 +1,43 @@
-name: Corrigir caminhos do Kingdom Halloween
+name: Aplicar imagens Halloween enviadas
 on:
   push:
     paths:
-      - '.github/workflows/extrair-halloween.yml'
+      - 'kingdom-fotos-certas.zip'
   workflow_dispatch:
 permissions:
   contents: write
 jobs:
-  corrigir:
+  fotos:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          persist-credentials: true
-      - name: Corrigir links relativos e publicar
+      - name: Aplicar apenas as imagens dos produtos
         run: |
+          test -f kingdom-fotos-certas.zip
+          unzip -o kingdom-fotos-certas.zip -d .
           python3 - <<'PY'
           from pathlib import Path
-          import re
-          for p in Path('.').glob('*.html'):
+          mapping={
+            '15_4db301cf863fb4f.webp':'1200',
+            '16_ea26cb1f3ec7252.webp':'1700',
+            '17_79c172db90cc95d.webp':'2100',
+            '19_ae8d53392fd4266.webp':'3600',
+            '20_fcde71818be41f2.webp':'4500',
+            '21_df9a2e29ac129f8.webp':'7000',
+            '22_476a18e05630faf.webp':'10000'
+          }
+          for n in ['index.html','www-recargabuxs-com-9ffv-produtos.html']:
+              p=Path(n)
+              if not p.exists(): continue
               s=p.read_text(encoding='utf-8')
-              s=re.sub(r'<base\s+href=["\']https?://[^>]+>', '', s, flags=re.I)
+              for old,amount in mapping.items():
+                  s=s.replace('./images/'+old,'./images/kingdom-halloween/'+amount+'.png')
               p.write_text(s,encoding='utf-8')
           PY
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
+          git add images/kingdom-halloween index.html www-recargabuxs-com-9ffv-produtos.html
           if ! git diff --cached --quiet; then
-            git commit -m "Corrigir base href que apontava imagens para outro dominio"
+            git commit -m "Aplicar fotos Halloween enviadas pelo usuario"
             git push
           fi
