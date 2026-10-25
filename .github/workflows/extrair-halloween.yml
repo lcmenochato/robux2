@@ -1,0 +1,26 @@
+name: Extrair site Kingdom Halloween
+on:
+  push:
+    paths:
+      - '.github/workflows/extrair-halloween.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  extrair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Extrair arquivos do site
+        run: |
+          unzip -o kingdom_halloween_flevo_novo_20261025.zip -d .
+          test -f index.html
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "Publicar arquivos extraídos do Kingdom Halloween"
+            git push
+          fi
