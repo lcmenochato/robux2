@@ -1,4 +1,4 @@
-name: Aplicar fotos Kingdom Robux
+name: Corrigir caminhos do Kingdom Halloween
 on:
   push:
     paths:
@@ -7,44 +7,26 @@ on:
 permissions:
   contents: write
 jobs:
-  atualizar:
+  corrigir:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Substituir fotos dos cards
+        with:
+          persist-credentials: true
+      - name: Corrigir links relativos e publicar
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          import urllib.request, re
-          base='https://raw.githubusercontent.com/lcmenochato/robuxkingdom2/main/public/images/'
-          mapping={
-            '15_4db301cf863fb4f.webp':'robux-1200.jpg',
-            '16_ea26cb1f3ec7252.webp':'robux-1700.jpg',
-            '17_79c172db90cc95d.webp':'robux-2100.jpg',
-            '19_ae8d53392fd4266.webp':'robux-3600.jpg',
-            '20_fcde71818be41f2.webp':'robux-4500.jpg',
-            '21_df9a2e29ac129f8.webp':'robux-7000.jpg',
-            '22_476a18e05630faf.webp':'robux-10000.jpg'
-          }
-          Path('images/kingdom').mkdir(parents=True,exist_ok=True)
-          for old,new in mapping.items():
-              url=base+new
-              request=urllib.request.Request(url,headers={'User-Agent':'GitHubActions'})
-              with urllib.request.urlopen(request,timeout=25) as response:
-                  data=response.read()
-              if len(data)<1000: raise ValueError('Imagem vazia: '+url)
-              Path('images/kingdom',new).write_bytes(data)
+          import re
           for p in Path('.').glob('*.html'):
               s=p.read_text(encoding='utf-8')
               s=re.sub(r'<base\s+href=["\']https?://[^>]+>', '', s, flags=re.I)
-              for old,new in mapping.items():
-                  s=s.replace('./images/'+old,'./images/kingdom/'+new)
               p.write_text(s,encoding='utf-8')
           PY
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           if ! git diff --cached --quiet; then
-            git commit -m "Substituir fotos dos cards pelas imagens Kingdom Robux"
+            git commit -m "Corrigir base href que apontava imagens para outro dominio"
             git push
           fi
