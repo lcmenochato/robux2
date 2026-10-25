@@ -1,0 +1,23 @@
+
+/* Halloween Roxo Sombrio + Laranja — visual only */
+:root{--h-purple:#8a2be2;--h-orange:#ff6a00;--h-dark:#0a0414}
+html{background:#0a0414!important}body{background-color:#0a0414!important;color:#f5edff!important}
+header,nav,footer{background-color:rgba(18,8,31,.94)!important;border-color:#552478!important}
+main{position:relative}body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 15% 22%,rgba(138,43,226,.15),transparent 48%),radial-gradient(ellipse at 85% 75%,rgba(255,106,0,.08),transparent 42%);animation:haze 13s ease-in-out infinite alternate}
+@keyframes haze{from{opacity:.55;transform:translateX(-2%)}to{opacity:1;transform:translateX(2%)}}
+.halloween-hero{position:relative;isolation:isolate;overflow:hidden;margin:20px auto 32px;max-width:1220px;min-height:245px;padding:44px 26px;text-align:center;border:1px solid #8a2be2;border-radius:22px;background:radial-gradient(ellipse at 25% 50%,#401069 0%,transparent 55%),linear-gradient(115deg,#0b0416,#230c39 50%,#3a160d);box-shadow:0 0 35px #7d26d340}
+.halloween-hero::before{content:"🦇　🕸️　🦇";position:absolute;top:15px;left:15px;font-size:24px;opacity:.65;animation:batfloat 7s ease-in-out infinite alternate}
+.halloween-hero::after{content:"🎃";position:absolute;right:5%;bottom:8%;font-size:68px;filter:drop-shadow(0 0 18px #ff6a00);animation:batfloat 5s ease-in-out infinite alternate}
+.halloween-hero h2{font-weight:900;font-size:clamp(30px,5vw,58px);line-height:1.12;color:#f7e9ff;text-shadow:0 0 20px #8a2be2;margin:12px 0}
+.halloween-hero h2 span{color:#ff8a21}.halloween-hero p{color:#e2c7f5;font-size:clamp(13px,2vw,18px)}.halloween-hero small{color:#ffab5c;letter-spacing:3px;font-weight:800}
+@keyframes batfloat{to{transform:translate(12px,-12px)}}
+/* Product tiles, alternating glowing outlines without touching links or scripts */
+main a:has(img),main article,main [class*="product-card"]{transition:box-shadow .25s ease,transform .25s ease,border-color .25s ease}
+main a:has(img):nth-of-type(odd),main article:nth-of-type(odd){border-color:#8a2be2!important;box-shadow:0 0 13px #8a2be238}
+main a:has(img):nth-of-type(even),main article:nth-of-type(even){border-color:#ff6a00!important;box-shadow:0 0 13px #ff6a0033}
+main a:has(img):hover,main article:hover{transform:translateY(-4px);box-shadow:0 0 24px #8a2be288!important}
+button:not([disabled]),a[class*="bg-\[\#FF6A00\]"]{transition:filter .2s,box-shadow .2s,transform .2s}
+button:not([disabled]):hover{filter:brightness(1.13);box-shadow:0 0 19px #ff6a0080}
+.halloween-web{position:fixed;top:75px;right:0;z-index:2;pointer-events:none;font-size:48px;opacity:.23}
+@media(prefers-reduced-motion:reduce){.halloween-hero::before,.halloween-hero::after,body::before{animation:none!important}}
+@media(max-width:600px){.halloween-hero{margin:12px;padding:36px 12px;min-height:210px}.halloween-hero::after{font-size:38px}}
