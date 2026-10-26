@@ -4,15 +4,15 @@ const catalog=Object.freeze({1200:19.90,1700:24.90,2100:35.90,3600:42.90,4500:59
 const $=id=>document.getElementById(id), money=n=>n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 const params=new URLSearchParams(location.search), requested=params.get('product');
 if(Object.hasOwn(catalog,requested))$('product').value=requested;
-function refresh(){$('price').textContent=money(catalog[$('product').value]);} $('product').addEventListener('change',refresh);refresh();
+let quantity=Math.max(1,Math.min(20,Number.parseInt(params.get('qty')||'1',10)||1));window.kingdomQty=quantity;window.kingdomSetQty=function(n){quantity=Math.max(1,Math.min(20,n));window.kingdomQty=quantity;refresh();};function refresh(){const amount=catalog[$('product').value]*quantity;$('price').textContent=money(amount);$('subtotal').textContent=money(amount);$('item-price').textContent=money(amount);$('qty-value').textContent=quantity;$('product-count').textContent=quantity;} $('product').addEventListener('change',refresh);refresh();
 let payment=null,timer=null;function err(m){$('error').textContent=m;}
 $('pay').addEventListener('click',async()=>{
  const username=$('username').value.trim(),email=$('email').value.trim(),product=$('product').value;
  if(!username){err('Informe seu usuário Roblox.');return;}
  if(email&&!$('email').checkValidity()){err('Informe um e-mail válido ou deixe o campo vazio.');return;}
- const amount=catalog[product];if(!amount)return;
+ const amount=Number((catalog[product]*quantity).toFixed(2));if(!amount)return;
  $('pay').disabled=true;err('');
- try{const res=await fetch(API+'/api/create-pix',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,username,amount,product:product+' Robux',source:'kingdom-robux-new'})});
+ try{const res=await fetch(API+'/api/create-pix',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,username,amount,product:product+' Robux x'+quantity,quantity,source:'kingdom-robux-new'})});
  const data=await res.json();if(!res.ok||data.success===false)throw Error(data.message||'Falha ao gerar Pix');
  const id=String(data.paymentId||data.reference||data.transactionId||''),code=String(data.copyPaste||data.pixCode||''),qr=String(data.qrcodeUrl||data.qrCodeUrl||'');
  if(!id||(!code&&!qr))throw Error('Resposta Pix incompleta do servidor');
