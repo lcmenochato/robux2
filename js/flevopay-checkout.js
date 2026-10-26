@@ -17,7 +17,7 @@ $('pay').addEventListener('click',async()=>{
  const id=String(data.paymentId||data.reference||data.transactionId||''),code=String(data.copyPaste||data.pixCode||''),base64=String(data.qrCodeBase64||data.qr_code_base64||''),qr=String(data.qrcodeUrl||data.qrCodeUrl||(base64?(base64.startsWith('data:image/')?base64:'data:image/png;base64,'+base64):''));
  if(!id||(!code&&!qr))throw Error('Resposta Pix incompleta do servidor');
  payment={id,code,qr,amount};$('details').hidden=true;$('pix').style.display='block';$('pixprice').textContent=money(amount);$('code').textContent=code||'Use o QR Code';
- if(qr&&/^(data:image\/|https:\/\/)/.test(qr)){$('qr').src=qr;$('qr').hidden=false;}else $('qr').hidden=true;const local=$('qr-local');if(local){local.replaceChildren();local.hidden=true;if(code&&typeof QRCode!=='undefined'){new QRCode(local,{text:code,width:220,height:220,correctLevel:QRCode.CorrectLevel.M});local.hidden=false;}}
+ if(qr&&/^(data:image\/|https:\/\/)/.test(qr)){$('qr').src=qr;$('qr').hidden=false;}else $('qr').hidden=true;const local=$('qr-local');if(local){local.replaceChildren();local.style.display='none';if(code&&typeof QRCode!=='undefined'){new QRCode(local,{text:code,width:220,height:220,correctLevel:QRCode.CorrectLevel.L});local.style.display='flex';$('qr').hidden=true;}else if(!qr&&code){const img=document.createElement('img');img.alt='QR Code Pix';img.width=220;img.height=220;img.src='https://api.qrserver.com/v1/create-qr-code/?size=220x220&data='+encodeURIComponent(code);local.appendChild(img);local.style.display='flex';}}
  $('status').textContent='Aguardando confirmação do pagamento...';timer=setInterval(check,4000);check();
  }catch(e){err(e.message||'Erro de conexão com o servidor Pix.');}finally{$('pay').disabled=false;}
 });
