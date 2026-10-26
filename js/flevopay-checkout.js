@@ -9,12 +9,12 @@ let payment=null,timer=null;function err(m){$('error').textContent=m;}
 $('pay').addEventListener('click',async()=>{
  const username=$('username').value.trim(),email=$('email').value.trim(),product=$('product').value;
  if(!username){err('Informe seu usuário Roblox.');return;}
- if(email&&!$('email').checkValidity()){err('Informe um e-mail válido ou deixe o campo vazio.');return;}
+ if(!email||!$('email').checkValidity()){err('Informe um e-mail válido para gerar o Pix.');$('email').focus();return;}
  const amount=Number((catalog[product]*quantity).toFixed(2));if(!amount)return;
  $('pay').disabled=true;err('');
  try{const res=await fetch(API+'/api/create-pix',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,username,amount,product:product+' Robux x'+quantity,quantity,source:'kingdom-robux-new'})});
  const data=await res.json();if(!res.ok||data.success===false)throw Error(data.message||'Falha ao gerar Pix');
- const id=String(data.paymentId||data.reference||data.transactionId||''),code=String(data.copyPaste||data.pixCode||''),qr=String(data.qrcodeUrl||data.qrCodeUrl||'');
+ const id=String(data.paymentId||data.reference||data.transactionId||''),code=String(data.copyPaste||data.pixCode||''),base64=String(data.qrCodeBase64||data.qr_code_base64||''),qr=String(data.qrcodeUrl||data.qrCodeUrl||(base64?(base64.startsWith('data:image/')?base64:'data:image/png;base64,'+base64):''));
  if(!id||(!code&&!qr))throw Error('Resposta Pix incompleta do servidor');
  payment={id,code,qr,amount};$('details').hidden=true;$('pix').style.display='block';$('pixprice').textContent=money(amount);$('code').textContent=code||'Use o QR Code';
  if(qr&&/^(data:image\/|https:\/\/)/.test(qr)){$('qr').src=qr;$('qr').hidden=false;}else $('qr').hidden=true;
