@@ -17,7 +17,7 @@ $('pay').addEventListener('click',async()=>{
  const id=String(data.paymentId||data.reference||data.transactionId||''),code=String(data.copyPaste||data.pixCode||''),base64=String(data.qrCodeBase64||data.qr_code_base64||''),qr=String(data.qrcodeUrl||data.qrCodeUrl||(base64?(base64.startsWith('data:image/')?base64:'data:image/png;base64,'+base64):''));
  if(!id||(!code&&!qr))throw Error('Resposta Pix incompleta do servidor');
  payment={id,code,qr,amount};$('details').hidden=true;$('pix').style.display='block';$('pixprice').textContent=money(amount);$('code').textContent=code||'Use o QR Code';
- if(qr&&/^(data:image\/|https:\/\/)/.test(qr)){$('qr').src=qr;$('qr').hidden=false;}else $('qr').hidden=true;
+ if(qr&&/^(data:image\/|https:\/\/)/.test(qr)){$('qr').src=qr;$('qr').hidden=false;}else $('qr').hidden=true;const local=$('qr-local');if(local){local.replaceChildren();local.hidden=true;if(code&&typeof QRCode!=='undefined'){new QRCode(local,{text:code,width:220,height:220,correctLevel:QRCode.CorrectLevel.M});local.hidden=false;}}
  $('status').textContent='Aguardando confirmação do pagamento...';timer=setInterval(check,4000);check();
  }catch(e){err(e.message||'Erro de conexão com o servidor Pix.');}finally{$('pay').disabled=false;}
 });
